@@ -1,20 +1,13 @@
 <template>
 	<div class="desktop-background">
-		<div
-			v-for="(circle, index) in circleElements"
-			:key="index"
-			class="desktop-background-element"
-			:style="{
-				left: `${circle.x}%`,
-				top: `${circle.y}%`,
-				backgroundColor: circle.color,
-				animationDelay: `${index * -10}s`,
-			}"
+		<canvas
+			ref="gradientCanvas"
+			class="background-canvas"
 		/>
-		<div class="desktop-background-noise">
+		<div class="background-noise">
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 700 700"
+				:viewBox="`0 0 ${canvasWidth} ${canvasHeight}`"
 			>
 				<defs>
 					<filter id="noise-filter">
@@ -51,32 +44,63 @@ import { defineComponent } from 'vue'
 export default defineComponent({
 	setup() {
 		return {
+			canvasWidth: 1500,
+			canvasHeight: 980,
+			gradientCanvas: ref<HTMLCanvasElement>(),
 			circleElements: [{
-				x: 35,
-				y: -30,
+				x: 74,
+				y: 156,
 				color: '#9B5DCA',
 			}, {
-				x: -55,
-				y: -20,
-				color: '#B532CA',
-			}, {
-				x: 45,
-				y: 30,
+				x: 1000,
+				y: 250,
 				color: '#c2626c',
 			}, {
-				x: 70,
-				y: -50,
+				x: 1268,
+				y: -400,
 				color: '#f1c6cf',
 			}, {
-				x: 15,
-				y: -85,
+				x: 700,
+				y: -120,
 				color: '#c260a7',
 			}, {
-				x: -40,
-				y: -70,
+				x: 843,
+				y: -800,
+				color: '#B532CA',
+			}, {
+				x: 40,
+				y: -624,
 				color: '#4d68bb',
 			}],
 		}
+	},
+	mounted() {
+		const canvasCtx = this.gradientCanvas?.getContext('2d')
+		if (!this.gradientCanvas || !canvasCtx) return
+
+		// Set our resolution of the canvas to be the original width/height
+		this.gradientCanvas.width = this.canvasWidth
+		this.gradientCanvas.height = this.canvasHeight
+
+		// Set the filter to blur all the rendered circles
+		canvasCtx.filter = 'blur(150px)'
+
+		// Create our circle elements on the canvas from our list of circles
+		this.circleElements.forEach((circleElement) => {
+			canvasCtx.fillStyle = circleElement.color
+			canvasCtx.beginPath()
+			canvasCtx.ellipse(
+				circleElement.x,
+				circleElement.y,
+				600,
+				800,
+				Math.PI / 8,
+				0,
+				2 * Math.PI,
+			)
+			canvasCtx.fill()
+			canvasCtx.restore()
+		})
 	},
 })
 </script>
@@ -85,49 +109,30 @@ export default defineComponent({
 .desktop-background {
 	width: 100dvw;
 	height: 100dvh;
-	position: relative;
+	position: fixed;
 	overflow: hidden;
 	filter: contrast(200%);
+	z-index: -1;
+	isolation: isolate;
 
-	&-noise-cover {
+	.background-canvas {
+		position: absolute;
+		z-index: 0;
+		aspect-ratio: v-bind(canvasWidth) / v-bind(canvasHeight);
+		height: 100%;
+	}
+
+	.background-noise {
 		position: absolute;
 		inset: 0;
 		filter: url('#noise-filter');
 		opacity: 75%;
 		mix-blend-mode: soft-light;
+		z-index: 1;
 	}
+}
 
-	&-element {
-		rotate: 50deg;
-		width: 75%;
-		aspect-ratio: 1/1.15;
-		position: absolute;
-		border-radius: 9999px;
-		filter: blur(200px);
-		animation: rotate 60s 0.1s linear infinite;
-		transform-origin: center;
-	}
+@media screen and (width >= v-bind(canvasWidth) ){
 
-	@keyframes rotate {
-		0% {
-			transform: rotate(0) translate3d(0, 0, 0);
-		}
-
-		25% {
-			transform: rotate(90deg) translate3d(-10%, 0, 5px);
-		}
-
-		50% {
-			transform: rotate(180deg) translate3d(0, -20%, 10px);
-		}
-
-		75% {
-			transform: rotate(270deg) translate3d(10%, 0, 5px);
-		}
-
-		100% {
-			transform: rotate(360deg) translate3d(0, 0, 0);
-		}
-	}
 }
 </style>
