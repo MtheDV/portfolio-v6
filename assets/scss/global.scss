@@ -1,4 +1,21 @@
+* {
+	box-sizing: border-box;
+}
+
 html, body {
 	padding: 0;
 	margin: 0;
+	font-family: 'Manrope', sans-serif;
+	color: rgb(255 255 255);
+	user-select: none;
+}
+
+.nuxt-icon {
+	display: inline-flex;
+
+	svg {
+		width: unset !important;
+		height: unset !important;
+		margin: 0 !important;
+	}
 }

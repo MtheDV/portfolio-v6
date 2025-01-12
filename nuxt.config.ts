@@ -1,6 +1,8 @@
 export default defineNuxtConfig({
 	modules: [
 		'@nuxt/eslint',
+		'@nuxtjs/google-fonts',
+		'nuxt-icons',
 	],
 	devtools: { enabled: true },
 	css: ['~/assets/scss/global.scss'],
@@ -11,6 +13,14 @@ export default defineNuxtConfig({
 				indent: 'tab',
 				commaDangle: 'always-multiline',
 				semi: false,
+			},
+		},
+	},
+	googleFonts: {
+		preload: true,
+		families: {
+			Manrope: {
+				wght: [300, 400, 500, 600, 700],
 			},
 		},
 	},
